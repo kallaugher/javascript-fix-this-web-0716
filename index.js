@@ -8,8 +8,9 @@ var cake = {
   decorate: function(updateFunction) {
     var status = "Decorating with " + this.topping + ". Ready to eat soon!"
     updateFunction(status)
+    dessert = this;
     setTimeout(function() {
-      updateFunction(serve.apply(this, "Happy Eating!", this.customer))
+      updateFunction(serve.call(dessert, "Happy Eating!", dessert.customer))
     }, 2000)
   }
 }
@@ -24,44 +25,55 @@ var pie = {
 }
 
 function makeCake() {
-  var updateCakeStatus;
-  mix(updateCakeStatus)
+  var updateCakeStatus = updateStatus.bind(this);
+  mix.call(this, updateCakeStatus);
 }
 
 function makePie() {
-  var updatePieStatus;
-  mix(updatePieStatus)
+  var updatePieStatus = updateStatus.bind(this);
+  mix.call(this, updatePieStatus);
 }
 
 function updateStatus(statusText) {
-  this.getElementsByClassName("status")[0].innerText = statusText
+  this.div.getElementsByClassName("status")[0].innerText = statusText
+
 }
 
 function bake(updateFunction) {
   var status = "Baking at " + this.bakeTemp + " for " + this.bakeTime
+  var dessert = this;
   setTimeout(function() {
-    cool(updateFunction)
+    cool.call(dessert, updateFunction)
   }, 2000)
+  updateFunction(status);
 }
 
 function mix(updateFunction) {
   var status = "Mixing " + this.ingredients.join(", ")
+  var dessert = this;
   setTimeout(function() {
-    bake(updateFunction)
+    bake.call(dessert, updateFunction)
   }, 2000)
-  updateFunction(status)
+  updateFunction(status);
 }
 
 function cool(updateFunction) {
   var status = "It has to cool! Hands off!"
+  var dessert = this
   setTimeout(function() {
-    this.decorate(updateFunction)
+    cake.decorate.call(dessert, updateFunction)
   }, 2000)
+  updateFunction(status);
 }
 
 function makeDessert() {
-  //add code here to decide which make... function to call
-  //based on which link was clicked
+  if (this.innerHTML === "Make Cake") {
+    cake.div = this.parentElement;
+    makeCake.call(cake);
+  } else {
+    pie.div = this.parentElement;
+    makePie.call(pie);
+  }
 }
 
 function serve(message, customer) {
