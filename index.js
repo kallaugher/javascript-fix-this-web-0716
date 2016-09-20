@@ -8,9 +8,9 @@ var cake = {
   decorate: function(updateFunction) {
     var status = "Decorating with " + this.topping + ". Ready to eat soon!"
     updateFunction(status)
-    dessert = this;
+    var serveFunction = serve.bind(this, "Happy Eating!", this.customer)
     setTimeout(function() {
-      updateFunction(serve.call(dessert, "Happy Eating!", dessert.customer))
+      updateFunction(serveFunction())
     }, 2000)
   }
 }
@@ -26,53 +26,53 @@ var pie = {
 
 function makeCake() {
   var updateCakeStatus = updateStatus.bind(this);
-  mix.call(this, updateCakeStatus);
+  mix.call(cake, updateCakeStatus);
 }
 
 function makePie() {
   var updatePieStatus = updateStatus.bind(this);
-  mix.call(this, updatePieStatus);
+  mix.call(pie, updatePieStatus);
 }
 
 function updateStatus(statusText) {
-  this.div.getElementsByClassName("status")[0].innerText = statusText
+  this.getElementsByClassName("status")[0].innerText = statusText
 
 }
 
 function bake(updateFunction) {
   var status = "Baking at " + this.bakeTemp + " for " + this.bakeTime
-  var dessert = this;
+  var coolFunction = cool.bind(this)
   setTimeout(function() {
-    cool.call(dessert, updateFunction)
+    coolFunction(updateFunction);
   }, 2000)
   updateFunction(status);
 }
 
 function mix(updateFunction) {
   var status = "Mixing " + this.ingredients.join(", ")
-  var dessert = this;
+  var bakeFunction = bake.bind(this)
   setTimeout(function() {
-    bake.call(dessert, updateFunction)
+    bakeFunction(updateFunction);
   }, 2000)
   updateFunction(status);
 }
 
 function cool(updateFunction) {
   var status = "It has to cool! Hands off!"
-  var dessert = this
+  var decorate = cake.decorate.bind(this)
   setTimeout(function() {
-    cake.decorate.call(dessert, updateFunction)
+    decorate(updateFunction)
   }, 2000)
   updateFunction(status);
 }
 
 function makeDessert() {
   if (this.innerHTML === "Make Cake") {
-    cake.div = this.parentElement;
-    makeCake.call(cake);
+    var div = this.parentElement;
+    makeCake.call(div);
   } else {
-    pie.div = this.parentElement;
-    makePie.call(pie);
+    var div = this.parentElement;
+    makePie.call(div);
   }
 }
 
